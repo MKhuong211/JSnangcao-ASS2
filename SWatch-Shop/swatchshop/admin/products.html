@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý sản phẩm - SWatch-Shop</title>
+  <link rel="stylesheet" href="../styles/main.css"/>
+  <link rel="stylesheet" href="../styles/admin.css"/>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <h2>SWatch Admin</h2>
+      <ul class="admin-nav">
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="categories.html">Danh mục</a></li>
+        <li><a class="active" href="products.html">Sản phẩm</a></li>
+        <li><a href="customers.html">Khách hàng</a></li>
+        <li><a href="orders.html">Đơn hàng</a></li>
+        <li><a href="../index.html">Về trang chủ</a></li>
+        <li><a href="#" id="logoutBtn">Đăng xuất</a></li>
+      </ul>
+    </aside>
+
+    <main class="admin-content">
+      <div class="admin-header">
+        <h1 class="title">Quản lý sản phẩm</h1>
+        <div class="admin-toolbar">
+          <button class="btn" id="addProductBtn">+ Thêm sản phẩm</button>
+        </div>
+      </div>
+
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:90px">ID</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th style="width:120px"># Biến thể</th>
+              <th style="width:180px">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="productList">
+            <tr><td colspan="5" style="text-align:center">Đang tải…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Sản phẩm -->
+  <div class="modal" id="productModal" aria-hidden="true">
+    <div class="modal-content" style="max-width: 920px;">
+      <div class="modal-header">
+        <h2 id="modalTitle">Thêm sản phẩm</h2>
+        <button type="button" class="close-modal" aria-label="Đóng">&times;</button>
+      </div>
+
+      <form id="productForm">
+        <input type="hidden" id="productId"/>
+
+        <div class="stats-grid" style="margin-bottom:0">
+          <div class="stat-card">
+            <h3>Thông tin chính</h3>
+            <div class="form-group">
+              <label for="productName">Tên sản phẩm *</label>
+              <input id="productName" type="text" required />
+            </div>
+            <div class="form-group">
+              <label for="productCategory">Danh mục *</label>
+              <select id="productCategory" required></select>
+            </div>
+            <div class="form-group">
+              <label for="productDetail">Mô tả</label>
+              <textarea id="productDetail" rows="4"></textarea>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <h3>Hình ảnh</h3>
+            <div class="form-group">
+              <label for="productImage">URL hình ảnh</label>
+              <input id="productImage" type="text" placeholder="https://… hoặc để trống nếu tải file"/>
+            </div>
+            <div class="form-group">
+              <label for="productImageFile">Hoặc tải ảnh (≤ 2MB)</label>
+              <input id="productImageFile" type="file" accept="image/jpeg,image/jpg,image/png,image/webp"/>
+              <small>JPG, PNG, WEBP • Tối đa 2MB</small>
+              <div id="imagePreview" style="margin-top:10px; display:none;">
+                <img id="previewImg" alt="Preview" style="max-width:200px; max-height:200px; border:1px solid var(--border); padding:5px"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biến thể -->
+        <div id="variantsSection" class="stat-card" style="margin-top: var(--space-5)">
+          <h3>Biến thể sản phẩm</h3>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px">
+            <input id="variantColor"      type="text"   placeholder="Màu (vd: Đen)"                style="flex:1; min-width:120px"/>
+            <input id="variantColorCode"  type="text"   placeholder="Mã màu (vd: #000000)"         style="flex:1; min-width:120px"/>
+            <input id="variantSize"       type="text"   placeholder="Size (vd: M)"                  style="flex:1; min-width:100px"/>
+            <input id="variantPrice"      type="number" placeholder="Giá"                           style="flex:1; min-width:100px"/>
+            <input id="variantQuantity"   type="number" placeholder="Số lượng"                     style="flex:1; min-width:100px"/>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <input id="variantImage" type="hidden"/>
+            <input id="variantImageFile" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" style="margin-bottom:5px"/>
+            <small>Ảnh riêng cho biến thể (tùy chọn, ≤ 2MB)</small>
+            <div id="variantImagePreview" style="margin-top:5px; display:none;">
+              <img id="variantPreviewImg" alt="Preview" style="max-width:100px; max-height:100px; border:1px solid var(--border); padding:5px"/>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:12px">
+            <button type="button" class="btn btn-small" id="addVariantBtn">Thêm biến thể</button>
+            <button type="button" class="btn btn-small btn-secondary" id="clearVariantInputs">Xoá ô nhập</button>
+          </div>
+
+          <div class="data-table">
+            <table style="font-size:14px">
+              <thead>
+                <tr>
+                  <th>Ảnh</th>
+                  <th>Màu</th>
+                  <th>Mã màu</th>
+                  <th>Size</th>
+                  <th>Giá</th>
+                  <th>SL</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="variantsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top: var(--space-5)">
+          <button type="submit" class="btn">Lưu sản phẩm</button>
+          <button type="button" class="btn btn-secondary close-modal">Huỷ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../scripts/admin/products.js"></script>
+</body>
+</html>
